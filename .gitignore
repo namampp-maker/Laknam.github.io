@@ -1,0 +1,8 @@
+# Ignore everything except the portfolio files
+*
+
+# Allow these
+!.gitignore
+!index.html
+!about me/
+!about me/photo.jpg
