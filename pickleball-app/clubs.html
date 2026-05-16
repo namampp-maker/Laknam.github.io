@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clubs — SmashPoint</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* ── Club grid ──────────────────────────────────── */
+    .clubs-section { padding: var(--space-xl); }
+    .clubs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+    }
+
+    /* ── Club card ──────────────────────────────────── */
+    .club-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--space-lg);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      transition: all 0.2s var(--ease);
+    }
+    .club-card:hover {
+      border-color: var(--border-hi);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+    .club-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #050508;
+      margin-bottom: var(--space-sm);
+      flex-shrink: 0;
+    }
+    .club-name {
+      font-family: var(--font-head);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .club-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .club-stats {
+      display: flex;
+      gap: var(--space-lg);
+      margin-top: var(--space-sm);
+    }
+    .cstat-num {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .cstat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .club-amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .club-hours { font-size: 0.75rem; color: var(--muted); }
+    .club-price {
+      font-size: 0.82rem;
+      color: var(--muted2);
+    }
+    .club-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--border);
+    }
+    .featured-banner {
+      background: var(--accent-dim);
+      border: 1px solid rgba(181,242,61,0.2);
+      border-radius: var(--r-sm);
+      padding: 3px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 1100px) { .clubs-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 700px)  { .clubs-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px)  { .clubs-section { padding: var(--space-md); } }
+  </style>
+</head>
+<body data-page="clubs">
+  <script src="js/data.js"></script>
+  <script src="js/nav.js"></script>
+
+  <!-- Page hero -->
+  <div class="page-hero">
+    <div class="page-hero-glow"></div>
+    <div class="page-hero-inner">
+      <div class="eyebrow">Find Your Club</div>
+      <h1 class="page-title">Bangkok <em>Clubs</em></h1>
+      <p class="page-sub">Discover pickleball clubs across the city. Join a community, access premium courts, and compete.</p>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <input type="text" class="filter-input" id="f-search" placeholder="Search club name…">
+    <select class="filter-select" id="f-district">
+      <option value="all">All Districts</option>
+    </select>
+    <button class="filter-toggle" id="f-indoor"><span class="dot"></span>Indoor Courts</button>
+    <button class="filter-toggle" id="f-coaching"><span class="dot"></span>Coaching</button>
+    <button class="filter-toggle" id="f-cafe"><span class="dot"></span>Café</button>
+    <span class="filter-reset" id="f-reset">Reset</span>
+    <span class="filter-count" id="f-count"></span>
+  </div>
+
+  <div class="clubs-section">
+    <div class="clubs-grid" id="clubs-grid"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Smash<span>Point</span></div>
+      <div class="footer-links">
+        <a href="courts.html">Courts</a>
+        <a href="events.html">Events</a>
+        <a href="players.html">Players</a>
+        <a href="clubs.html">Clubs</a>
+      </div>
+      <div class="footer-copy">© 2026 SmashPoint. Bangkok, Thailand.</div>
+    </div>
+  </footer>
+
+  <script src="js/clubs.js"></script>
+</body>
+</html>

@@ -6,3 +6,7 @@
 !index.html
 !about me/
 !about me/photo.jpg
+!pickleball-app/
+!pickleball-app/**
+pickleball-app/.next/
+pickleball-app/node_modules/

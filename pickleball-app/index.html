@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmashPoint — Bangkok's Pickleball Platform</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    /* ── Hero ──────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: calc(var(--nav-h) + 40px) var(--space-xl) var(--space-3xl);
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute;
+      bottom: -10%;
+      left: 50%;
+      transform: translateX(-50%) rotateX(68deg);
+      width: 160%;
+      height: 80%;
+      background-image:
+        linear-gradient(rgba(181,242,61,0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(181,242,61,0.12) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform-origin: bottom center;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+    }
+    .hero-glow-1 {
+      position: absolute;
+      top: 10%;
+      left: 15%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(181,242,61,0.12) 0%, transparent 70%);
+      filter: blur(40px);
+    }
+    .hero-glow-2 {
+      position: absolute;
+      top: 30%;
+      right: 10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+      filter: blur(40px);
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .hero-headline {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      margin-top: var(--space-md);
+      overflow: hidden;
+    }
+    .hero-line {
+      display: block;
+      overflow: hidden;
+    }
+    .hero-line-inner {
+      display: block;
+      transform: translateY(110%);
+      color: var(--text);
+    }
+    .hero-line-inner.accent { color: var(--accent); }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted2);
+      max-width: 480px;
+      margin-top: var(--space-xl);
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .hero-ctas {
+      display: flex;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .scroll-cue {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      opacity: 0;
+    }
+
+    /* ── Stats bar ─────────────────────────────────── */
+    .stats-bar {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-xl) var(--space-xl);
+    }
+    .stats-bar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-xl);
+      text-align: center;
+    }
+    .stat-big-num {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-big-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+    }
+
+    /* ── Court preview section ─────────────────────── */
+    .court-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+    #mini-map {
+      width: 100%;
+      height: 360px;
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      pointer-events: none;
+    }
+    .mini-court-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .mini-court-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .mini-court-card:hover { border-color: var(--accent); background: var(--surface2); }
+    .mini-court-num {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      width: 40px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    /* ── Bento grid ────────────────────────────────── */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: var(--space-md);
+    }
+    .bento-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--space-xl);
+      transition: all 0.25s var(--ease);
+    }
+    .bento-card:hover {
+      border-color: var(--border-hi);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .bento-card.wide { grid-column: span 2; }
+    .bento-icon { font-size: 2.5rem; margin-bottom: var(--space-md); }
+    .bento-title {
+      font-family: var(--font-head);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+    .bento-desc { font-size: 0.875rem; color: var(--muted2); line-height: 1.6; }
+
+    /* ── Leaderboard teaser ────────────────────────── */
+    .lb-teaser {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+    .lb-teaser-head {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .lb-teaser-head h2 { font-family:var(--font-head);font-size:1rem;font-weight:700; }
+
+    /* ── Club spotlight ────────────────────────────── */
+    .clubs-row {
+      display: flex;
+      gap: var(--space-md);
+      overflow-x: auto;
+      padding-bottom: var(--space-sm);
+      scrollbar-width: none;
+    }
+    .clubs-row::-webkit-scrollbar { display: none; }
+    .club-spot {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--space-lg);
+      flex-shrink: 0;
+      width: 280px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .club-spot:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    /* ── CTA section ───────────────────────────────── */
+    .cta-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      padding: var(--space-3xl) var(--space-xl);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(181,242,61,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(181,242,61,0.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .cta-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 600px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(181,242,61,0.15) 0%, transparent 70%);
+      filter: blur(30px);
+      pointer-events: none;
+    }
+    .cta-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cta-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .cta-sub { font-size: 1rem; color: var(--muted2); margin: var(--space-md) 0 var(--space-xl); }
+    .cta-btns { display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; }
+
+    .lb-ranking-section-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .hero { padding-left: var(--space-md); padding-right: var(--space-md); }
+      .stats-bar-inner { grid-template-columns: repeat(2,1fr); }
+      .court-preview { grid-template-columns: 1fr; }
+      .bento { grid-template-columns: 1fr 1fr; }
+      .bento-card.wide { grid-column: span 1; }
+      .section { padding: var(--space-2xl) var(--space-md); }
+      .cta-section { padding: var(--space-2xl) var(--space-md); }
+      .lb-ranking-section-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 580px) {
+      .stats-bar-inner { grid-template-columns: repeat(2,1fr); gap: var(--space-lg); }
+      .hero-ctas { flex-direction: column; }
+      .bento { grid-template-columns: 1fr; }
+      .hero-headline { font-size: clamp(3rem, 15vw, 5rem); }
+    }
+  </style>
+</head>
+<body data-page="home">
+  <script src="js/data.js"></script>
+  <script src="js/nav.js"></script>
+
+  <!-- Hero ──────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-grid"></div>
+      <div class="hero-glow-1"></div>
+      <div class="hero-glow-2"></div>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-eyebrow eyebrow">Bangkok's Pickleball Platform</div>
+      <h1 class="hero-headline">
+        <span class="hero-line"><span class="hero-line-inner">Play.</span></span>
+        <span class="hero-line"><span class="hero-line-inner">Connect.</span></span>
+        <span class="hero-line"><span class="hero-line-inner accent">Dominate.</span></span>
+      </h1>
+      <p class="hero-sub">Find courts, join open play sessions, host games with friends, and connect with Bangkok's growing pickleball community.</p>
+      <div class="hero-ctas">
+        <a href="courts.html" class="btn btn-fill btn-lg">Find Courts →</a>
+        <a href="events.html" class="btn btn-outline btn-lg">Browse Events</a>
+        <a href="events.html#host" class="btn btn-outline btn-lg" style="border-color:rgba(167,139,250,0.4);color:#a78bfa" onclick="sessionStorage.setItem('openHostModal','1')">+ Host a Game</a>
+      </div>
+    </div>
+    <div class="scroll-cue">
+      <div class="scroll-indicator">Scroll</div>
+    </div>
+  </section>
+
+  <!-- Stats Bar ────────────────────────────────────────── -->
+  <div class="stats-bar">
+    <div class="stats-bar-inner">
+      <div>
+        <div class="stat-big-num" data-target="142" id="stat-courts">0</div>
+        <div class="stat-big-label">Courts</div>
+      </div>
+      <div>
+        <div class="stat-big-num" data-target="890" id="stat-players">0</div>
+        <div class="stat-big-label">Active Players</div>
+      </div>
+      <div>
+        <div class="stat-big-num" data-target="63" id="stat-clubs">0</div>
+        <div class="stat-big-label">Clubs</div>
+      </div>
+      <div>
+        <div class="stat-big-num" data-target="1240" id="stat-events">0</div>
+        <div class="stat-big-label">Events Hosted</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Events Marquee ──────────────────────────────── -->
+  <div class="marquee-wrap" id="events-marquee"></div>
+
+  <!-- Court Finder Preview ─────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Find Nearby</div>
+        <h2 class="section-title">Courts Across Bangkok</h2>
+        <p class="section-sub">15 venues and counting — from Sukhumvit to Bangna, indoor and outdoor.</p>
+      </div>
+      <div class="court-preview">
+        <div id="mini-map"></div>
+        <div>
+          <div class="mini-court-list" id="featured-courts"></div>
+          <div style="margin-top:var(--space-md)">
+            <a href="courts.html" class="btn btn-outline">Explore All Courts →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature bento grid ───────────────────────────────── -->
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Everything you need</div>
+        <h2 class="section-title">Built for Players & Clubs</h2>
+      </div>
+      <div class="bento">
+        <a class="bento-card wide" href="courts.html" data-tilt style="text-decoration:none;color:inherit">
+          <div class="bento-icon">🗺️</div>
+          <div class="bento-title">Court Finder + Live Map</div>
+          <div class="bento-desc">Browse 15+ pickleball courts across Bangkok. Filter by surface, indoor/outdoor, night lighting, and price. Map view with CartoDB dark tiles.</div>
+        </a>
+        <a class="bento-card" href="events.html" data-tilt style="text-decoration:none;color:inherit">
+          <div class="bento-icon">🏓</div>
+          <div class="bento-title">Open Play & Events</div>
+          <div class="bento-desc">Join sessions, clinics, and tournaments. Register with one tap.</div>
+        </a>
+        <a class="bento-card" href="players.html" data-tilt style="text-decoration:none;color:inherit">
+          <div class="bento-icon">📊</div>
+          <div class="bento-title">Player Ratings</div>
+          <div class="bento-desc">DUPR-style skill ratings from 2.5 to 5.0+. Track your progress and climb the leaderboard.</div>
+        </a>
+        <a class="bento-card" href="clubs.html" data-tilt style="text-decoration:none;color:inherit">
+          <div class="bento-icon">🏢</div>
+          <div class="bento-title">Club Pages</div>
+          <div class="bento-desc">Find your club, manage memberships, and browse upcoming events at each venue.</div>
+        </a>
+        <a class="bento-card" href="players.html" data-tilt style="text-decoration:none;color:inherit">
+          <div class="bento-icon">🤝</div>
+          <div class="bento-title">Find a Partner</div>
+          <div class="bento-desc">Filter players by skill level, district, and playing style. Connect with your next doubles partner.</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Leaderboard teaser ───────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="lb-ranking-section-grid">
+        <div>
+          <div class="eyebrow">Bangkok Rankings</div>
+          <h2 class="section-title" style="margin-bottom:var(--space-xl)">Top Ranked<br>Players</h2>
+          <div class="lb-teaser" id="lb-teaser"></div>
+          <div style="margin-top:var(--space-md)">
+            <a href="players.html" class="btn btn-outline">Full Leaderboard →</a>
+          </div>
+        </div>
+        <!-- Quick event list -->
+        <div>
+          <div class="eyebrow">Happening Soon</div>
+          <h2 class="section-title" style="font-size:1.8rem;margin-bottom:var(--space-xl)">Next Events</h2>
+          <div id="upcoming-events"></div>
+          <a href="events.html" class="btn btn-ghost" style="margin-top:var(--space-md)">All Events →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Club Spotlight ───────────────────────────────────── -->
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border)">
+    <div class="container">
+      <div class="section-head" style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div>
+          <div class="eyebrow">Community</div>
+          <h2 class="section-title">Featured Clubs</h2>
+        </div>
+        <a href="clubs.html" class="btn btn-ghost">View All →</a>
+      </div>
+      <div class="clubs-row" id="club-spotlight"></div>
+    </div>
+  </section>
+
+  <!-- CTA ─────────────────────────────────────────────── -->
+  <section class="cta-section">
+    <div class="cta-grid"></div>
+    <div class="cta-glow"></div>
+    <div class="cta-inner">
+      <div class="eyebrow">Get in the game</div>
+      <h2 class="cta-title">Ready to play?</h2>
+      <p class="cta-sub">Join Bangkok's fastest growing pickleball community. Find a court near you and book your first game today.</p>
+      <div class="cta-btns">
+        <a href="courts.html" class="btn btn-fill btn-lg">Find Courts</a>
+        <a href="events.html" class="btn btn-outline btn-lg">Browse Events</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer ───────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Smash<span>Point</span></div>
+      <div class="footer-links">
+        <a href="courts.html">Courts</a>
+        <a href="events.html">Events</a>
+        <a href="players.html">Players</a>
+        <a href="clubs.html">Clubs</a>
+      </div>
+      <div class="footer-copy">© 2026 SmashPoint. Bangkok, Thailand.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

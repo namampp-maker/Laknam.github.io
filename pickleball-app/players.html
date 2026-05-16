@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Players — SmashPoint</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* ── Layout ─────────────────────────────────────── */
+    .players-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 0;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl) var(--space-3xl);
+    }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar {
+      padding: var(--space-xl) var(--space-md) 0 0;
+      position: sticky;
+      top: calc(var(--nav-h) + var(--space-md));
+      align-self: start;
+    }
+    .sidebar-section { margin-bottom: var(--space-xl); }
+    .sidebar-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: var(--space-sm);
+    }
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .pill {
+      padding: 5px 12px;
+      border-radius: var(--r-pill);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--surface2);
+      color: var(--muted2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pill.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .sidebar-select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* ── Main ─────────────────────────────────────────── */
+    .players-main { padding-top: var(--space-xl); }
+
+    /* ── Leaderboard ──────────────────────────────────── */
+    .leaderboard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+    }
+    .leaderboard-head {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .leaderboard-head h2 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .lb-row {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      gap: var(--space-md);
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row:hover { background: var(--surface2); }
+    .lb-rank {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1;
+    }
+    .lb-rank.top { color: var(--accent); }
+    .lb-rank.gold { color: var(--skill-elite); }
+    .lb-info { display: flex; align-items: center; gap: var(--space-md); }
+    .lb-name {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .lb-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .lb-right { text-align: right; }
+    .lb-rating {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .lb-record { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+
+    /* ── Player grid ──────────────────────────────────── */
+    .grid-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+    .grid-header h2 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+    }
+    .players-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+
+    .player-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--space-md);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+    .player-card:hover {
+      border-color: var(--border-hi);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .player-card-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+    .player-info { flex: 1; }
+    .player-name {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .player-rating-big {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .player-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: var(--space-sm);
+    }
+
+    /* List view row */
+    .players-grid.list-view .player-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+    }
+    .players-grid.list-view .player-card-top { margin-bottom: 0; }
+    .players-grid.list-view .player-tags { display: none; }
+
+    @media (max-width: 900px) {
+      .players-layout { grid-template-columns: 1fr; padding: 0 var(--space-md) var(--space-2xl); }
+      .sidebar { position: static; padding: var(--space-md) 0 0; }
+      .players-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 580px) {
+      .players-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page="players">
+  <script src="js/data.js"></script>
+  <script src="js/nav.js"></script>
+
+  <!-- Page hero -->
+  <div class="page-hero">
+    <div class="page-hero-glow"></div>
+    <div class="page-hero-inner">
+      <div class="eyebrow">Community Rankings</div>
+      <h1 class="page-title">Players &amp; <em>Leaderboard</em></h1>
+      <p class="page-sub">Discover Bangkok's top pickleball players, track ratings, and find your next partner.</p>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <input type="text" class="filter-input" id="f-search" placeholder="Search player name…">
+    <select class="filter-select" id="f-style">
+      <option value="all">All Styles</option>
+      <option value="singles">Singles</option>
+      <option value="doubles">Doubles</option>
+      <option value="both">Both</option>
+    </select>
+    <select class="filter-select" id="f-gender">
+      <option value="all">All</option>
+      <option value="M">Male</option>
+      <option value="F">Female</option>
+    </select>
+    <button class="filter-toggle" id="f-partner"><span class="dot"></span>Looking for Partner</button>
+    <select class="filter-select" id="f-sort" style="margin-left:auto">
+      <option value="rating">Sort: Rating</option>
+      <option value="games">Sort: Games Played</option>
+      <option value="wins">Sort: Wins</option>
+    </select>
+    <span class="filter-count" id="f-count"></span>
+  </div>
+
+  <div class="players-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Skill Level</div>
+        <div class="pill-group" id="skill-pills">
+          <button class="pill active" data-skill="all">All</button>
+          <button class="pill" data-skill="beginner">Beginner</button>
+          <button class="pill" data-skill="2.5">2.5</button>
+          <button class="pill" data-skill="3.0">3.0</button>
+          <button class="pill" data-skill="3.5">3.5</button>
+          <button class="pill" data-skill="4.0">4.0</button>
+          <button class="pill" data-skill="4.5">4.5</button>
+          <button class="pill" data-skill="5.0">5.0+</button>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">District</div>
+        <div class="pill-group" id="district-pills">
+          <button class="pill active" data-district="all">All</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="players-main">
+      <!-- Top 5 Leaderboard -->
+      <div class="leaderboard" id="leaderboard"></div>
+
+      <!-- Full player grid -->
+      <div class="grid-header">
+        <h2 id="grid-title">All Players</h2>
+        <div class="view-toggle">
+          <button class="view-btn active" id="grid-btn" onclick="setView('grid')">⊞ Grid</button>
+          <button class="view-btn" id="list-btn" onclick="setView('list')">☰ List</button>
+        </div>
+      </div>
+      <div class="players-grid" id="players-grid"></div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Smash<span>Point</span></div>
+      <div class="footer-links">
+        <a href="courts.html">Courts</a>
+        <a href="events.html">Events</a>
+        <a href="players.html">Players</a>
+        <a href="clubs.html">Clubs</a>
+      </div>
+      <div class="footer-copy">© 2026 SmashPoint. Bangkok, Thailand.</div>
+    </div>
+  </footer>
+
+  <script src="js/players.js"></script>
+</body>
+</html>

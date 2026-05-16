@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Club — SmashPoint</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .club-hero {
+      padding-top: calc(var(--nav-h) + var(--space-3xl));
+      padding-bottom: var(--space-2xl);
+      padding-left: var(--space-xl);
+      padding-right: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .club-hero-glow { position:absolute;inset:0;pointer-events:none; }
+    .club-hero-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: var(--space-xl);
+      position: relative;
+      z-index: 2;
+    }
+    .club-logo-hero {
+      width: 88px;
+      height: 88px;
+      border-radius: var(--r-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #050508;
+      flex-shrink: 0;
+    }
+    .club-hero-name {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .club-stats-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-md) var(--space-xl);
+    }
+    .club-stats-bar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      gap: var(--space-2xl);
+      flex-wrap: wrap;
+    }
+    .cs { text-align: center; }
+    .cs-num { font-family:var(--font-head);font-size:1.5rem;font-weight:700;color:var(--accent); }
+    .cs-label { font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em; }
+
+    .club-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: var(--space-2xl) var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: var(--space-2xl);
+    }
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    .section-card h3 {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Courts list */
+    .court-mini {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .court-mini:last-child { border-bottom: none; }
+    .court-mini-name { font-weight: 600; font-size: 0.88rem; }
+    .court-mini-sub  { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* Member row */
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s;
+      border-radius: var(--r-sm);
+    }
+    .member-row:last-child { border-bottom: none; }
+    .member-row:hover { background: var(--surface2); }
+    .member-name { font-size: 0.88rem; font-weight: 600; flex: 1; }
+    .member-rating { font-family:var(--font-head);font-size:0.9rem;font-weight:700;color:var(--accent); }
+
+    /* Event mini */
+    .event-mini {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .event-mini:last-child { border-bottom: none; }
+    .event-mini-date { font-family:var(--font-head);font-size:0.8rem;font-weight:700;color:var(--accent);width:70px;flex-shrink:0; }
+    .event-mini-name { font-size:0.85rem;font-weight:600; }
+    .event-mini-sub  { font-size:0.72rem;color:var(--muted); }
+
+    /* Gallery */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: var(--space-sm);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      margin-bottom: var(--space-lg);
+    }
+    .gallery-cell {
+      aspect-ratio: 4/3;
+      border-radius: var(--r-sm);
+      overflow: hidden;
+    }
+    .gallery-placeholder {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.3s;
+    }
+    .gallery-cell:hover .gallery-placeholder { transform: scale(1.05); }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; color: var(--muted);
+      margin-bottom: var(--space-md); transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .club-content { grid-template-columns: 1fr; }
+      .club-hero, .club-stats-bar { padding-left:var(--space-md);padding-right:var(--space-md); }
+      .gallery { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body data-page="clubs">
+  <script src="js/data.js"></script>
+  <script src="js/nav.js"></script>
+  <div id="club-page"></div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Smash<span>Point</span></div>
+      <div class="footer-links">
+        <a href="courts.html">Courts</a>
+        <a href="events.html">Events</a>
+        <a href="players.html">Players</a>
+        <a href="clubs.html">Clubs</a>
+      </div>
+      <div class="footer-copy">© 2026 SmashPoint. Bangkok, Thailand.</div>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const cid = params.get('id');
+    const club = clubs.find(c => c.id === cid);
+    if (!club) { window.location.href = 'clubs.html'; }
+    else {
+      document.title = club.name + ' — SmashPoint';
+      const color = getAvatarColor(club.id);
+      const initial = club.name[0];
+      const mapsUrl = `https://www.google.com/maps?q=${club.lat},${club.lng}`;
+
+      const clubCourts = courts.filter(c => c.club_id === club.id);
+      const clubEvents = events.filter(e => e.club_id === club.id).sort((a,b) => a.date.localeCompare(b.date)).slice(0,6);
+      const clubPlayers = players.filter(p => p.club_id === club.id).sort((a,b) => b.rating - a.rating).slice(0,8);
+
+      // Gallery: colored placeholder boxes
+      const galleryColors = ['#0f1220','#141828','#0a0d18','#111522','#0d1016','#131723'];
+      const galleryPatterns = [
+        'repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(181,242,61,0.03) 10px,rgba(181,242,61,0.03) 20px)',
+        'repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(59,130,246,0.03) 10px,rgba(59,130,246,0.03) 20px)',
+        'repeating-linear-gradient(0deg,transparent,transparent 12px,rgba(249,115,22,0.03) 12px,rgba(249,115,22,0.03) 24px)',
+      ];
+
+      const galleryHtml = [0,1,2,3,4,5].map(i => `
+        <div class="gallery-cell">
+          <div class="gallery-placeholder" style="background:${galleryColors[i]};${galleryPatterns[i%3]}">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0.3;font-size:2rem">🏓</div>
+          </div>
+        </div>
+      `).join('');
+
+      const amenityHtml = club.amenities.map(a => {
+        const ai = amenityIcon(a);
+        return `<span class="badge badge-surface">${ai.icon} ${ai.label}</span>`;
+      }).join('');
+
+      document.getElementById('club-page').innerHTML = `
+        <!-- Hero -->
+        <div class="club-hero">
+          <div class="club-hero-glow" style="background:radial-gradient(ellipse 50% 80% at 10% 0%,${color}22,transparent 70%)"></div>
+          <div class="club-hero-inner">
+            <div class="club-logo-hero" style="background:${color}">${initial}</div>
+            <div>
+              <a href="clubs.html" class="back-link">← All Clubs</a>
+              <div class="club-hero-name">${club.name}</div>
+              <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-sm);flex-wrap:wrap;align-items:center">
+                <span class="badge badge-surface">📍 ${club.district}</span>
+                <div class="stars">${renderStars(club.rating)}</div>
+                <span style="font-size:0.78rem;color:var(--muted)">${club.rating} (${club.reviews_count} reviews)</span>
+                ${club.featured ? '<span class="badge badge-accent">⭐ Featured</span>' : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="club-stats-bar">
+          <div class="club-stats-bar-inner">
+            <div class="cs"><div class="cs-num">${club.courts_count}</div><div class="cs-label">Courts</div></div>
+            <div class="cs"><div class="cs-num">${club.member_count}</div><div class="cs-label">Members</div></div>
+            <div class="cs"><div class="cs-num">${club.membership_fee ? '฿'+club.membership_fee : 'Free'}</div><div class="cs-label">Membership/mo</div></div>
+            <div class="cs"><div class="cs-num">${club.founded}</div><div class="cs-label">Founded</div></div>
+            <div class="cs"><div class="cs-num">${club.hours.open}–${club.hours.close}</div><div class="cs-label">Hours Today</div></div>
+          </div>
+        </div>
+
+        <!-- Gallery -->
+        <div style="padding:var(--space-xl);max-width:1280px;margin:0 auto">
+          <div class="gallery">${galleryHtml}</div>
+        </div>
+
+        <!-- Content -->
+        <div class="club-content">
+          <div>
+            <!-- About -->
+            <div class="section-card">
+              <h3>About ${club.name}</h3>
+              <p style="font-size:0.9rem;color:var(--muted2);line-height:1.7">${club.description}</p>
+              <div style="margin-top:var(--space-md);display:flex;flex-wrap:wrap;gap:6px">${amenityHtml}</div>
+            </div>
+
+            <!-- Courts -->
+            <div class="section-card">
+              <h3>Courts at this Club</h3>
+              ${clubCourts.length === 0
+                ? '<p style="color:var(--muted);font-size:0.85rem">No individual courts listed.</p>'
+                : clubCourts.map(ct => `
+                    <div class="court-mini">
+                      <div>
+                        <div class="court-mini-name">${ct.name}</div>
+                        <div class="court-mini-sub">${ct.courts_count} courts · ${ct.surface} · ${ct.indoor ? 'Indoor' : 'Outdoor'} ${ct.lit ? '· 💡 Lit' : ''}</div>
+                      </div>
+                      <div style="text-align:right">
+                        <div style="font-family:var(--font-head);font-weight:700;color:var(--accent);font-size:0.95rem">
+                          ${ct.price_per_hour === 0 ? 'Free' : '฿'+ct.price_per_hour+'/hr'}
+                        </div>
+                        <div style="font-size:0.72rem;color:var(--muted)">${ct.hours.open}–${ct.hours.close}</div>
+                      </div>
+                    </div>
+                  `).join('')
+              }
+            </div>
+
+            <!-- Events -->
+            <div class="section-card">
+              <h3>Upcoming Events</h3>
+              ${clubEvents.length === 0
+                ? '<p style="color:var(--muted);font-size:0.85rem">No upcoming events listed.</p>'
+                : clubEvents.map(ev => {
+                    const type = getEventTypeBadge(ev.type);
+                    return `
+                      <div class="event-mini">
+                        <div class="event-mini-date">${formatDate(ev.date)}</div>
+                        <div>
+                          <div class="event-mini-name">${ev.title}</div>
+                          <div class="event-mini-sub">${ev.time_start}–${ev.time_end} · <span class="badge ${type.cls}" style="font-size:0.65rem">${type.label}</span></div>
+                        </div>
+                        <span style="font-family:var(--font-head);font-weight:700;color:var(--orange);font-size:0.85rem;margin-left:auto">${ev.price === 0 ? 'Free' : '฿'+ev.price}</span>
+                      </div>
+                    `;
+                  }).join('')
+              }
+              <a href="events.html" class="btn btn-ghost btn-sm" style="margin-top:var(--space-sm)">All Events →</a>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <aside>
+            <!-- Members -->
+            <div class="section-card">
+              <h3>Top Members</h3>
+              ${clubPlayers.length === 0
+                ? '<p style="color:var(--muted);font-size:0.85rem">No members listed.</p>'
+                : clubPlayers.map((p,i) => {
+                    const tier = getSkillTier(p.skill_level);
+                    return `
+                      <a class="member-row" href="player-detail.html?id=${p.id}">
+                        <div class="avatar" style="background:${getAvatarColor(p.id)}">${getInitials(p.name)}</div>
+                        <div style="flex:1">
+                          <div class="member-name">${p.name}</div>
+                          <span class="badge skill-${tier}" style="font-size:0.65rem">${p.skill_level}</span>
+                        </div>
+                        <div class="member-rating">${p.rating.toFixed(1)}</div>
+                      </a>
+                    `;
+                  }).join('')
+              }
+              <a href="players.html" class="btn btn-ghost btn-sm" style="margin-top:var(--space-sm)">All Players →</a>
+            </div>
+
+            <!-- Contact -->
+            <div class="section-card">
+              <h3>Contact & Info</h3>
+              <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--muted2)">
+                ${club.phone ? `<div>📞 ${club.phone}</div>` : ''}
+                ${club.email ? `<div>✉️ <a href="mailto:${club.email}" style="color:var(--accent)">${club.email}</a></div>` : ''}
+                ${club.instagram ? `<div>📷 ${club.instagram}</div>` : ''}
+                <div>⏰ ${club.hours.open}–${club.hours.close} · ${club.hours.days}</div>
+              </div>
+              <div style="margin-top:var(--space-md);display:flex;flex-direction:column;gap:var(--space-sm)">
+                <button class="btn btn-fill" onclick="alert('Membership enquiry sent!')">Join This Club</button>
+                <a href="${mapsUrl}" target="_blank" rel="noopener" class="btn btn-outline">Get Directions</a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

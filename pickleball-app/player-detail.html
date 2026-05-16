@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player — SmashPoint</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .player-hero {
+      padding-top: calc(var(--nav-h) + var(--space-3xl));
+      padding-bottom: var(--space-2xl);
+      padding-left: var(--space-xl);
+      padding-right: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .player-hero-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .player-hero-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--space-xl);
+      position: relative;
+      z-index: 2;
+    }
+    .player-avatar-xl {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-size: 2rem;
+      font-weight: 700;
+      color: #050508;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.08);
+    }
+    .player-hero-name {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .player-hero-meta { display: flex; gap: var(--space-md); align-items: center; margin-top: var(--space-sm); flex-wrap: wrap; }
+    .rating-display {
+      text-align: right;
+    }
+    .rating-num {
+      font-family: var(--font-head);
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .rating-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    .player-stats-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-md) var(--space-xl);
+    }
+    .player-stats-bar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      gap: var(--space-2xl);
+      flex-wrap: wrap;
+    }
+    .pstat { text-align: center; }
+    .pstat-num {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .pstat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .player-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: var(--space-2xl) var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: var(--space-2xl);
+    }
+
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    .section-card h3 {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Radar chart */
+    .radar-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: var(--space-md) 0;
+    }
+    .radar-wrap svg text { fill: var(--muted); font-size: 10px; font-family: 'Inter', sans-serif; }
+
+    /* Bio */
+    .bio-text { font-size: 0.9rem; color: var(--muted2); line-height: 1.7; }
+
+    /* Events list */
+    .event-mini {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .event-mini:last-child { border-bottom: none; }
+    .event-mini-date {
+      font-family: var(--font-head);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      width: 70px;
+      flex-shrink: 0;
+    }
+    .event-mini-name { font-size: 0.85rem; font-weight: 600; }
+    .event-mini-sub { font-size: 0.72rem; color: var(--muted); }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: var(--space-md);
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .player-hero-inner { grid-template-columns: auto 1fr; }
+      .rating-display { display: none; }
+      .player-content { grid-template-columns: 1fr; }
+      .player-hero, .player-stats-bar { padding-left: var(--space-md); padding-right: var(--space-md); }
+    }
+  </style>
+</head>
+<body data-page="players">
+  <script src="js/data.js"></script>
+  <script src="js/nav.js"></script>
+  <div id="player-page"></div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Smash<span>Point</span></div>
+      <div class="footer-links">
+        <a href="courts.html">Courts</a>
+        <a href="events.html">Events</a>
+        <a href="players.html">Players</a>
+        <a href="clubs.html">Clubs</a>
+      </div>
+      <div class="footer-copy">© 2026 SmashPoint. Bangkok, Thailand.</div>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('id');
+    const player = players.find(p => p.id === pid);
+
+    if (!player) {
+      window.location.href = 'players.html';
+    } else {
+      document.title = player.name + ' — SmashPoint';
+      const color = getAvatarColor(player.id);
+      const initials = getInitials(player.name);
+      const tier = getSkillTier(player.skill_level);
+      const court = getCourtById(player.home_court_id);
+      const club  = getClubById(player.club_id);
+      const winRate = Math.round((player.wins / (player.wins + player.losses)) * 100);
+
+      // Upcoming events (next 3 where skill matches or all)
+      const playerEvents = events.filter(e =>
+        e.skill_level === 'all' || e.skill_level === player.skill_level
+      ).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 4);
+
+      // Radar data (simulated)
+      const stats = {
+        Power:     Math.min(5, Math.max(2, player.rating - 0.2 + Math.random() * 0.6)),
+        Control:   Math.min(5, Math.max(2, player.rating + 0.1 + Math.random() * 0.4)),
+        Serve:     Math.min(5, Math.max(2, player.rating - 0.3 + Math.random() * 0.7)),
+        Net:       Math.min(5, Math.max(2, player.rating + 0.2 - Math.random() * 0.3)),
+        Strategy:  Math.min(5, Math.max(2, player.rating - 0.1 + Math.random() * 0.5)),
+        Stamina:   Math.min(5, Math.max(2, player.rating + 0.0 + Math.random() * 0.4))
+      };
+      const statKeys = Object.keys(stats);
+      const n = statKeys.length;
+      const cx = 100, cy = 100, r = 70;
+      function polar(i, val) {
+        const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
+        const d = (val / 5) * r;
+        return [cx + d * Math.cos(angle), cy + d * Math.sin(angle)];
+      }
+      function labelPos(i) {
+        const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
+        const d = r + 18;
+        return [cx + d * Math.cos(angle), cy + d * Math.sin(angle)];
+      }
+      const gridLevels = [1,2,3,4,5];
+      const gridPolygons = gridLevels.map(level => {
+        const pts = statKeys.map((_,i) => polar(i, level).join(',')).join(' ');
+        return `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+      }).join('');
+      const dataPoints = statKeys.map((_,i) => polar(i, stats[statKeys[i]]).join(',')).join(' ');
+      const labels = statKeys.map((k, i) => {
+        const [x,y] = labelPos(i);
+        return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle">${k}</text>`;
+      }).join('');
+      const radarSvg = `
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          ${gridPolygons}
+          ${statKeys.map((_,i) => {
+            const [ex,ey] = polar(i, 5);
+            return `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+          }).join('')}
+          <polygon points="${dataPoints}" fill="${color}33" stroke="${color}" stroke-width="2"/>
+          ${labels}
+        </svg>
+      `;
+
+      document.getElementById('player-page').innerHTML = `
+        <!-- Hero -->
+        <div class="player-hero">
+          <div class="player-hero-glow" style="background:radial-gradient(ellipse 50% 80% at 20% 0%, ${color}22, transparent 70%)"></div>
+          <div class="player-hero-inner">
+            <div class="player-avatar-xl" style="background:${color}">${initials}</div>
+            <div>
+              <a href="players.html" class="back-link">← All Players</a>
+              <div class="player-hero-name">${player.name}</div>
+              <div class="player-hero-meta">
+                <span class="badge skill-${tier}">${player.skill_level} — ${getSkillLabel(player.skill_level)}</span>
+                <span class="badge badge-surface">📍 ${player.district}</span>
+                <span class="badge badge-surface">${player.playing_style}</span>
+                ${player.looking_for_partner ? '<span class="badge badge-accent">🤝 Looking for partner</span>' : ''}
+              </div>
+            </div>
+            <div class="rating-display">
+              <div class="rating-num">${player.rating.toFixed(2)}</div>
+              <div class="rating-label">DUPR Rating</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="player-stats-bar">
+          <div class="player-stats-bar-inner">
+            <div class="pstat"><div class="pstat-num">${player.rating.toFixed(2)}</div><div class="pstat-label">Rating</div></div>
+            <div class="pstat"><div class="pstat-num">${player.wins}</div><div class="pstat-label">Wins</div></div>
+            <div class="pstat"><div class="pstat-num">${player.losses}</div><div class="pstat-label">Losses</div></div>
+            <div class="pstat"><div class="pstat-num">${winRate}%</div><div class="pstat-label">Win Rate</div></div>
+            <div class="pstat"><div class="pstat-num">${player.games_played}</div><div class="pstat-label">Games</div></div>
+            <div class="pstat"><div class="pstat-num">${court ? court.district : '—'}</div><div class="pstat-label">Home District</div></div>
+            <div class="pstat"><div class="pstat-num">${player.member_since}</div><div class="pstat-label">Member Since</div></div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="player-content">
+          <div>
+            <!-- Bio -->
+            <div class="section-card">
+              <h3>About</h3>
+              <p class="bio-text">${player.bio}</p>
+              ${club ? `<p class="bio-text" style="margin-top:var(--space-sm)">Member of <a href="club-detail.html?id=${club.id}" style="color:var(--accent)">${club.name}</a></p>` : ''}
+            </div>
+
+            <!-- Upcoming events -->
+            <div class="section-card">
+              <h3>Open Games in ${player.district}</h3>
+              ${playerEvents.length === 0
+                ? '<p style="color:var(--muted);font-size:0.85rem">No upcoming events found.</p>'
+                : playerEvents.map(ev => {
+                    const type = getEventTypeBadge(ev.type);
+                    return `
+                      <div class="event-mini">
+                        <div class="event-mini-date">${formatDate(ev.date)}</div>
+                        <div>
+                          <div class="event-mini-name">${ev.title}</div>
+                          <div class="event-mini-sub">${ev.time_start} · <span class="badge ${type.cls}" style="font-size:0.65rem">${type.label}</span></div>
+                        </div>
+                        <a href="events.html" class="btn btn-ghost btn-sm" style="margin-left:auto">View →</a>
+                      </div>
+                    `;
+                  }).join('')
+              }
+            </div>
+          </div>
+
+          <!-- Right sidebar -->
+          <aside>
+            <!-- Radar -->
+            <div class="section-card">
+              <h3>Skill Breakdown</h3>
+              <div class="radar-wrap">${radarSvg}</div>
+            </div>
+
+            <!-- Court info -->
+            ${court ? `
+              <div class="section-card">
+                <h3>Home Court</h3>
+                <div style="font-weight:600;font-size:0.9rem">${court.name}</div>
+                <div style="font-size:0.78rem;color:var(--muted);margin-top:4px">📍 ${court.district} · ${court.courts_count} courts</div>
+                <div style="font-size:0.78rem;color:var(--muted)">⏰ ${court.hours.open}–${court.hours.close}</div>
+                <div style="margin-top:var(--space-md);display:flex;gap:var(--space-sm)">
+                  <a href="courts.html" class="btn btn-outline btn-sm">Find Courts</a>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Actions -->
+            <div class="section-card">
+              <h3>Connect</h3>
+              <div style="display:flex;flex-direction:column;gap:var(--space-sm)">
+                <button class="btn btn-fill" onclick="alert('Message feature coming soon!')">Message ${player.name.split(' ')[0]}</button>
+                <button class="btn btn-outline" onclick="alert('Challenge sent!')">Challenge to a Match</button>
+                <a href="events.html" class="btn btn-ghost">Find Open Play →</a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
